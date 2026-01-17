@@ -1,5 +1,4 @@
 import Navbar from "../components/Navbar";
-import { fetchGeminiResponse } from "../utils/gemini";
 import React, { useState, useRef, useEffect } from "react";
 import { Send, Bot, User, Sparkles, AlertCircle, Loader2 } from "lucide-react";
 
@@ -26,33 +25,35 @@ function TanyaAI() {
   const sendMessage = async () => {
     if (!input.trim()) return;
 
-    const userText = input;
-    setMessages((prev) => [...prev, { role: "user", text: userText }]);
+    const userMessage = input;
+    setMessages((prev) => [...prev, { role: "user", text: userMessage }]);
     setInput("");
-    setLoading(true);
 
     try {
-      const reply = await fetchGeminiResponse(userText);
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: userMessage }),
+      });
+
+      const data = await res.json();
 
       setMessages((prev) => [
         ...prev,
         {
-          role: "ai",
-          text: reply,
+          role: "assistant",
+          text:
+            data.reply || "Aku di sini, tapi sedang butuh waktu sebentar ya 🌱",
         },
       ]);
     } catch (error) {
-      console.error(error);
       setMessages((prev) => [
         ...prev,
         {
-          role: "ai",
-          text: "Aku di sini, tapi sepertinya aku butuh waktu sebentar ya 🌱",
+          role: "assistant",
+          text: "Aku di sini, tapi sedang butuh waktu sebentar ya 🌿",
         },
       ]);
-    } finally {
-      setLoading(false);
-      inputRef.current?.focus();
     }
   };
 
