@@ -4,19 +4,49 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { message } = req.body;
+    const { message, history = [] } = req.body;
 
     if (!message) {
-      return res.status(400).json({ reply: "Pesan kosong" });
+      return res.status(400).json({ error: "Message is required" });
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      return res.status(500).json({ reply: "API key tidak tersedia" });
+    const API_KEY = process.env.GEMINI_API_KEY;
+    if (!API_KEY) {
+      return res.status(500).json({ error: "API key not configured" });
     }
+
+    // Memory ringan (biar AI nyambung)
+    const shortMemory = history
+      .slice(-4)
+      .map((m) => `- ${m.role}: ${m.text}`)
+      .join("\n");
+
+    const prompt = `
+Kamu adalah asisten AI kesehatan mental yang hangat, empatik, dan suportif.
+
+Aturan penting:
+- Gunakan bahasa Indonesia yang natural
+- Jangan menghakimi
+- Validasi emosi pengguna
+- Ajukan pertanyaan lanjutan yang lembut
+- Jangan terlalu panjang
+- Gunakan maksimal 1–2 emoji yang menenangkan 🌱
+- Jika pengguna terlihat sangat tertekan, arahkan ke bantuan profesional secara HALUS (jangan memaksa)
+
+Konteks percakapan sebelumnya:
+${shortMemory || "Belum ada percakapan sebelumnya."}
+
+Pesan pengguna:
+"${message}"
+
+Struktur jawaban:
+1. Validasi perasaan
+2. Respon empatik
+3. Pertanyaan lanjutan lembut
+`;
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${API_KEY}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -24,18 +54,7 @@ export default async function handler(req, res) {
           contents: [
             {
               role: "user",
-              parts: [
-                {
-                  text: `
-Kamu adalah AI pendamping kesehatan mental.
-Jawaban harus empatik, singkat, tidak menghakimi,
-dan membantu dengan bahasa yang lembut.
-
-Pesan pengguna:
-${message}
-`,
-                },
-              ],
+              parts: [{ text: prompt }],
             },
           ],
         }),
@@ -44,15 +63,18 @@ ${message}
 
     const data = await response.json();
 
-    const reply =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "Aku di sini ya 🌱, coba ulangi sebentar lagi.";
+    if (!response.ok) {
+      console.error(data);
+      return res.status(500).json({ error: "Gemini API error" });
+    }
 
-    return res.status(200).json({ reply });
+    const text =
+      data.candidates?.[0]?.content?.parts?.[0]?.text ||
+      "Aku di sini ya 🌱 Ceritakan pelan-pelan, aku mendengarkan.";
+
+    return res.status(200).json({ reply: text.trim() });
   } catch (error) {
-    console.error("Gemini error:", error);
-    return res.status(500).json({
-      reply: "Aku di sini 🌿 tapi sedang ada kendala kecil.",
-    });
+    console.error(error);
+    return res.status(500).json({ error: "Internal server error" });
   }
 }
