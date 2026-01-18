@@ -42,14 +42,16 @@ function Faq() {
       highlight: true,
     },
     {
-      name: "Anonymous Team",
+      name: "AMohamad Salman Alfarisi",
       role: "Product Leadership",
       image: "https://i.pravatar.cc/300?img=68",
+      highlight: true,
     },
     {
-      name: "Anonymous Team",
+      name: "Mohammad Rafi al-Qinthara",
       role: "Mental Health Advisor",
       image: "https://i.pravatar.cc/300?img=49",
+      highlight: true,
     },
     {
       name: "Anonymous Team",
@@ -67,14 +69,10 @@ function Faq() {
       image: "https://i.pravatar.cc/300?img=41",
     },
     {
-      name: "Anonymous Team",
+      name: "Muhammad Fauzan Firmansyah",
       role: "Platform Operations",
       image: "https://i.pravatar.cc/300?img=8",
-    },
-    {
-      name: "Anonymouse Team",
-      role: "Platform Operations",
-      image: "https://i.pravatar.cc/300?img=8",
+      highlight: true,
     },
   ];
 
