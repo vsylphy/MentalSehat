@@ -1,5 +1,11 @@
 import Navbar from "../components/Navbar";
-import { ChevronDown, ChevronUp, Linkedin, ShieldCheck } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Link,
+  Linkedin,
+  ShieldCheck,
+} from "lucide-react";
 import { useState } from "react";
 
 function Faq() {
@@ -37,41 +43,50 @@ function Faq() {
     {
       name: "Radhi Nur Rubiansyah",
       role: "Founder • Engineer • AI Developer",
-      image: "https://i.pravatar.cc/300?img=12",
+      image: "/public/images/1.png",
       linkedin: "https://www.linkedin.com/in/radhi-nur-rubiansyah-404298318/",
       highlight: true,
     },
     {
       name: "AMohamad Salman Alfarisi",
       role: "Product Leadership",
-      image: "https://i.pravatar.cc/300?img=68",
+      image: "/public/images/2.jpeg",
+      linkedin: "",
       highlight: true,
     },
     {
       name: "Mohammad Rafi al-Qinthara",
       role: "Mental Health Advisor",
-      image: "https://i.pravatar.cc/300?img=49",
+      image: "/public/images/3.jpeg",
+      linkedin: "",
       highlight: true,
     },
     {
-      name: "Anonymous Team",
+      name: "Miqdad Azzam Fawazy",
       role: "Research & Insight",
-      image: "https://i.pravatar.cc/300?img=33",
+      image: "/public/images/4.jpeg",
+      linkedin: "",
+      highlight: true,
     },
     {
-      name: "Anonymous Team",
+      name: "Yasfa Yulianti Nazia",
       role: "UI Experience Support",
-      image: "https://i.pravatar.cc/300?img=25",
+      image: "/public/images/5.jpeg",
+      linkedin: "",
+      highlight: true,
     },
     {
-      name: "Anonymous Team",
+      name: "Khaeyla Arsya wijaya",
       role: "Community & Outreach",
-      image: "https://i.pravatar.cc/300?img=41",
+      image: "/public/images/6.jpeg",
+      linkedin: "",
+      highlight: true,
     },
     {
       name: "Muhammad Fauzan Firmansyah",
       role: "Platform Operations",
-      image: "https://i.pravatar.cc/300?img=8",
+      image: "/public/images/7.jpeg",
+      linkedin: "",
       highlight: true,
     },
   ];

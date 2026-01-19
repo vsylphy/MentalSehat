@@ -57,34 +57,42 @@ function Navbar() {
         scrolled ? "bg-white shadow-lg" : "bg-white/95 backdrop-blur-sm"
       }`}
     >
-      <div className="container mx-auto px-4 sm:px-6">
+      <div className="container px-4 mx-auto sm:px-6">
         <div className="flex items-center justify-between h-20">
           {/* Logo & Brand */}
           <a href="/" className="flex items-center gap-3 group">
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-teal-400 to-blue-500 rounded-xl blur opacity-50 group-hover:opacity-75 transition-opacity"></div>
-              <div className="relative bg-gradient-to-br from-teal-500 to-blue-600 p-2.5 rounded-xl group-hover:scale-110 transition-transform duration-300">
-                <Heart className="w-6 h-6 text-white" fill="white" />
+              <div className="relative -ml-6">
+                <div className="relative">
+                  <img
+                    src="/images/logo.png"
+                    alt="Logo"
+                    className="
+      w-24 h-24 object-contain
+      drop-shadow-[0_0_10px_rgba(20,184,166,0.6)]
+    "
+                  />
+                </div>
               </div>
             </div>
             <div className="hidden sm:block">
-              <div className="text-xl font-bold bg-gradient-to-r from-teal-600 to-blue-600 bg-clip-text text-transparent">
+              <div className="-ml-5 text-xl font-bold text-transparent bg-gradient-to-r from-teal-600 to-blue-600 bg-clip-text">
                 MentalSehat
               </div>
-              <div className="text-xs text-gray-500 -mt-1">
+              <div className="-ml-5 text-xs text-gray-500">
                 Platform Kesehatan Mental
               </div>
             </div>
           </a>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="items-center hidden gap-8 md:flex">
             <ul className="flex items-center gap-1">
               {navLinks.map((link) => (
                 <li key={link.to}>
                   <a
                     href={link.to}
-                    className="px-4 py-2 text-gray-700 hover:text-teal-600 font-medium rounded-lg hover:bg-teal-50 transition-all duration-300 relative group"
+                    className="relative px-4 py-2 font-medium text-gray-700 transition-all duration-300 rounded-lg hover:text-teal-600 hover:bg-teal-50 group"
                   >
                     {link.label}
                     <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-teal-500 to-blue-500 group-hover:w-full transition-all duration-300"></span>
@@ -106,9 +114,9 @@ function Navbar() {
           </div>
 
           {/* Mobile Clock & Menu Button */}
-          <div className="flex md:hidden items-center gap-3">
+          <div className="flex items-center gap-3 md:hidden">
             {/* Mobile Clock */}
-            <div className="flex items-center gap-2 bg-gradient-to-r from-teal-50 to-blue-50 px-3 py-2 rounded-lg border border-teal-100">
+            <div className="flex items-center gap-2 px-3 py-2 border border-teal-100 rounded-lg bg-gradient-to-r from-teal-50 to-blue-50">
               <Clock className="w-4 h-4 text-teal-600" />
               <span className="text-sm font-bold text-gray-800 tabular-nums">
                 {formatTime(currentTime)}
@@ -118,7 +126,7 @@ function Navbar() {
             {/* Hamburger Button */}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="p-2 rounded-lg hover:bg-teal-50 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className="p-2 transition-colors duration-300 rounded-lg hover:bg-teal-50 focus:outline-none focus:ring-2 focus:ring-teal-500"
               aria-label="Toggle menu"
             >
               {isOpen ? (
@@ -138,12 +146,12 @@ function Navbar() {
         >
           <div className="py-4 space-y-1 border-t border-gray-100">
             {/* Date Display - Mobile */}
-            <div className="px-4 py-3 mb-2 bg-gradient-to-r from-teal-50 to-blue-50 rounded-lg border border-teal-100">
+            <div className="px-4 py-3 mb-2 border border-teal-100 rounded-lg bg-gradient-to-r from-teal-50 to-blue-50">
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <Clock className="w-4 h-4 text-teal-600" />
                 <span>{formatDate(currentTime)}</span>
               </div>
-              <div className="text-xs text-gray-500 mt-1 ml-6">
+              <div className="mt-1 ml-6 text-xs text-gray-500">
                 {formatTime(currentTime)} WIB
               </div>
             </div>
@@ -153,7 +161,7 @@ function Navbar() {
                 key={link.to}
                 href={link.to}
                 onClick={() => setIsOpen(false)}
-                className="block px-4 py-3 text-gray-700 hover:text-teal-600 hover:bg-teal-50 rounded-lg font-medium transition-all duration-300 transform hover:translate-x-1"
+                className="block px-4 py-3 font-medium text-gray-700 transition-all duration-300 transform rounded-lg hover:text-teal-600 hover:bg-teal-50 hover:translate-x-1"
                 style={{
                   animation: isOpen
                     ? `slideIn 0.3s ease-out ${index * 0.1}s both`
