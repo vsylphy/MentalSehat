@@ -23,11 +23,14 @@ function TanyaAI() {
   }, [messages]);
 
   const sendMessage = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || loading) return;
 
     const userMessage = input;
+
+    // tampilkan pesan user
     setMessages((prev) => [...prev, { role: "user", text: userMessage }]);
     setInput("");
+    setLoading(true);
 
     try {
       const res = await fetch("/api/chat", {
@@ -35,30 +38,34 @@ function TanyaAI() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message: userMessage,
-          history: messages.slice(-6),
+          // 🔒 kirim history SUPER AMAN & konsisten
+          history: messages
+            .filter((m) => m.role === "user" || m.role === "assistant")
+            .slice(-2),
         }),
       });
 
-      setLoading(true);
       const data = await res.json();
-      setLoading(false);
 
       setMessages((prev) => [
         ...prev,
         {
-          role: "assistant",
+          role: "ai",
           text:
-            data.reply || "Aku di sini, tapi sedang butuh waktu sebentar ya 🌱",
+            data.reply ||
+            "Aku tetap di sini 🌱 Kadang butuh satu napas sebelum lanjut.",
         },
       ]);
     } catch (error) {
       setMessages((prev) => [
         ...prev,
         {
-          role: "assistant",
-          text: "Aku di sini, tapi sedang butuh waktu sebentar ya 🌿",
+          role: "ai",
+          text: "Aku di sini ya 🌿 Kalau mau, kamu bisa lanjut cerita.",
         },
       ]);
+    } finally {
+      setLoading(false); // ✅ WAJIB
     }
   };
 

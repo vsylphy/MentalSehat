@@ -15,51 +15,37 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "API key not configured" });
     }
 
-    // 🔒 Batasi memory (AMAN)
-    const shortMemory = history
-      .slice(-3)
-      .map((m) => `${m.role}: ${m.text}`)
-      .join("\n");
+    // 🔒 Memory SUPER AMAN (ringkas saja)
+    const safeHistory = Array.isArray(history)
+      ? history.slice(-2).map((m) => `• ${m.role}: ${m.text.slice(0, 120)}`)
+      : [];
+
+    const context =
+      safeHistory.length > 0 ? safeHistory.join("\n") : "Belum ada konteks.";
 
     const prompt = `
-Kamu adalah asisten AI yang membantu secara langsung, hangat, dan solutif.
+Kamu adalah asisten AI kesehatan mental yang LANGSUNG membantu.
 
-ATURAN UTAMA:
-- SELALU berikan solusi atau jawaban paling masuk akal di AWAL
-- JANGAN memutar, bertele-tele, atau terlalu banyak bertanya
-- Jika informasi kurang, buat asumsi wajar dan jelaskan singkat
-- Pertanyaan klarifikasi hanya boleh di AKHIR jawaban (maksimal 1–2)
-- Gunakan bahasa sederhana, manusiawi, dan mudah dipahami
-- Fokus pada tindakan nyata, bukan teori panjang
+Aturan WAJIB:
+- Beri solusi paling masuk akal di AWAL
+- Jangan memutar atau terlalu banyak bertanya
+- Gunakan bahasa sederhana dan hangat
+- Jika user minta hiburan → hibur & beri semangat
+- Jika user sedang down → dukung dengan kata manis
+- Jika user nyeleneh / seksual → tolak tegas dan arahkan
+- Pertanyaan klarifikasi hanya boleh di AKHIR (maks 1)
 
-GAYA KOMUNIKASI:
-- Jika user terlihat sedih, lelah, bingung, atau down:
-  → berikan empati, dukungan lembut, dan kata-kata penyemangat
-- Jika user ingin santai, bercanda, atau ngobrol ringan:
-  → boleh bercanda ringan dan menghibur (tetap sopan)
-- Jika user bertanya aneh tapi tidak berbahaya:
-  → luruskan dengan ramah dan logis
-- Jika user bertanya jorok, seksual, atau tidak pantas:
-  → TOLAK dengan tegas, beri nasihat singkat, dan arahkan ke topik sehat
-  → jangan bercanda untuk topik ini
+Konteks singkat:
+${context}
 
-LARANGAN:
-- Jangan memancing emosi user
-- Jangan menggurui berlebihan
-- Jangan memutar jawaban hanya untuk terlihat aman
-
-KONTEKS SEBELUMNYA:
-${shortMemory || "Belum ada konteks."}
-
-PESAN USER:
+Pesan pengguna:
 "${message}"
 
-BALASAN HARUS MENGANDUNG:
-- Solusi / jawaban utama
-- Nada empati & dukungan
-- Opsional: humor ringan atau motivasi
-- Opsional: 1 pertanyaan lembut di akhir
-
+Balas dengan:
+1. Empati singkat
+2. Solusi / dukungan langsung
+3. Kalimat penyemangat
+4. (Opsional) satu pertanyaan lembut
 `;
 
     const response = await fetch(
@@ -68,30 +54,36 @@ BALASAN HARUS MENGANDUNG:
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          contents: [{ role: "user", parts: [{ text: prompt }] }],
+          contents: [
+            {
+              role: "user",
+              parts: [{ text: prompt }],
+            },
+          ],
         }),
       },
     );
 
     if (!response.ok) {
-      const err = await response.text();
-      console.error("Gemini API error:", err);
+      console.error("Gemini API error:", await response.text());
       return res.status(200).json({
-        reply: "Aku masih di sini ya 🌱 Kamu boleh cerita pelan-pelan.",
+        reply:
+          "Aku masih di sini 🌱 Tarik napas sebentar ya. Kamu tidak sendirian.",
       });
     }
 
     const data = await response.json();
+    const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
-    const reply =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "Aku mendengarkanmu 🌱";
-
-    return res.status(200).json({ reply: reply.trim() });
+    return res.status(200).json({
+      reply:
+        reply?.trim() ||
+        "Aku mendengarkanmu 🌿 Ceritakan pelan-pelan, aku di sini.",
+    });
   } catch (err) {
     console.error("Server error:", err);
     return res.status(200).json({
-      reply: "Aku di sini, hanya perlu waktu sebentar ya 🌿",
+      reply: "Aku tetap di sini 🌱 Kadang butuh satu napas sebelum lanjut.",
     });
   }
 }
