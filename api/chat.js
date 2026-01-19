@@ -7,7 +7,9 @@ export default async function handler(req, res) {
     const { message, history = [] } = req.body;
 
     if (!message || message.length > 500) {
-      return res.status(400).json({ error: "Invalid message" });
+      return res.status(200).json({
+        reply: "Aku di sini 🤍 Coba kirim ulang pesannya ya.",
+      });
     }
 
     const API_KEY = process.env.GEMINI_API_KEY;
@@ -15,57 +17,49 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "API key not configured" });
     }
 
-    const lower = message.toLowerCase();
-
-    if (
-      lower.includes("hibur") ||
-      lower.includes("capek") ||
-      lower.includes("sedih")
-    ) {
-      return res.status(200).json({
-        reply:
-          "Aku di sini 🤍\n\n✨ Kamu nggak lemah, kamu lagi capek.\n🌱 Pelan-pelan juga nggak apa-apa.\n😄 Kalau mau, aku bisa bercanda dikit atau kasih kata manis.",
-      });
-    }
+    // ✅ ROLE DISAMAKAN DENGAN FRONTEND
     const safeHistory = Array.isArray(history)
       ? history
+          .filter((m) => m.role === "user" || m.role === "ai")
           .slice(-2)
-          .map((m) => `• ${m.role}: ${String(m.text).slice(0, 120)}`)
-      : [];
+          .map((m) => `${m.role}: ${m.text.slice(0, 120)}`)
+          .join("\n")
+      : "Belum ada konteks.";
 
-    const context =
-      safeHistory.length > 0 ? safeHistory.join("\n") : "Belum ada konteks.";
+    const lower = message.toLowerCase();
+    const isHibur =
+      lower.includes("hibur") ||
+      lower.includes("capek") ||
+      lower.includes("sedih");
 
     const prompt = `
-Kamu adalah asisten AI kesehatan mental yang responsif dan hangat.
+Kamu adalah asisten AI kesehatan mental yang RAMAH, JELAS, dan LANGSUNG MENJAWAB.
 
-Aturan:
-- Jawab LANGSUNG kebutuhan user
+Gaya:
+- Jawab permintaan user secara langsung
+- Jika diminta list → buat list
+- Jika diminta hiburan → hibur
 - Jangan memutar
-- Gunakan bahasa sederhana & manusiawi
-- Jika user minta hiburan → langsung hibur
-- Jika user down → beri dukungan
 - Jangan mengulang kalimat yang sama
-- Maks 1 pertanyaan klarifikasi (opsional)
+- Bahasa sederhana dan hangat
 
 Konteks:
-${context}
+${safeHistory}
+
+Kondisi user:
+${isHibur ? "User sedang butuh hiburan dan dukungan." : "User meminta bantuan langsung."}
 
 Pesan user:
 "${message}"
 `;
+
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${API_KEY}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          contents: [
-            {
-              role: "user",
-              parts: [{ text: prompt }],
-            },
-          ],
+          contents: [{ role: "user", parts: [{ text: prompt }] }],
         }),
       },
     );
@@ -73,7 +67,7 @@ Pesan user:
     if (!response.ok) {
       console.error("Gemini API error:", await response.text());
       return res.status(200).json({
-        reply: "Aku tetap di sini 🌱 Kita lanjut pelan-pelan ya. Aku dengerin.",
+        reply: "Aku di sini 🤍 Mau aku bantu apa sekarang?",
       });
     }
 
@@ -83,13 +77,12 @@ Pesan user:
     return res.status(200).json({
       reply:
         reply?.trim() ||
-        "Aku dengerin kok 🤍 Mau lanjut cerita, minta saran, atau hiburan?",
+        "Aku di sini 🤍 Mau aku bantu atau hibur kamu sebentar?",
     });
   } catch (err) {
     console.error("Server error:", err);
     return res.status(200).json({
-      reply:
-        "Aku masih di sini 🌿 Kalau mau, kita tarik napas sebentar bareng.",
+      reply: "Aku tetap di sini 🤍 Tarik napas dulu ya.",
     });
   }
 }
