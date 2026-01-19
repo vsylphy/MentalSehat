@@ -33,10 +33,15 @@ function TanyaAI() {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: userMessage }),
+        body: JSON.stringify({
+          message: userMessage,
+          history: messages.slice(-6),
+        }),
       });
 
+      setLoading(true);
       const data = await res.json();
+      setLoading(false);
 
       setMessages((prev) => [
         ...prev,

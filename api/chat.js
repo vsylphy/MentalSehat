@@ -6,8 +6,8 @@ export default async function handler(req, res) {
   try {
     const { message, history = [] } = req.body;
 
-    if (!message) {
-      return res.status(400).json({ error: "Message is required" });
+    if (!message || message.length > 500) {
+      return res.status(400).json({ error: "Invalid message" });
     }
 
     const API_KEY = process.env.GEMINI_API_KEY;
@@ -15,34 +15,33 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "API key not configured" });
     }
 
-    // Memory ringan (biar AI nyambung)
+    // 🔒 Batasi memory (AMAN)
     const shortMemory = history
-      .slice(-4)
-      .map((m) => `- ${m.role}: ${m.text}`)
+      .slice(-3)
+      .map((m) => `${m.role}: ${m.text}`)
       .join("\n");
 
     const prompt = `
-Kamu adalah asisten AI kesehatan mental yang hangat, empatik, dan suportif.
+Kamu adalah asisten AI kesehatan mental yang empatik dan menenangkan.
 
-Aturan penting:
-- Gunakan bahasa Indonesia yang natural
+Aturan:
+- Bahasa Indonesia natural
+- Validasi emosi
 - Jangan menghakimi
-- Validasi emosi pengguna
-- Ajukan pertanyaan lanjutan yang lembut
-- Jangan terlalu panjang
-- Gunakan maksimal 1–2 emoji yang menenangkan 🌱
-- Jika pengguna terlihat sangat tertekan, arahkan ke bantuan profesional secara HALUS (jangan memaksa)
+- Maksimal 1 emoji 🌱
+- Jawaban singkat & hangat
+- Jika krisis, arahkan ke bantuan profesional secara lembut
 
-Konteks percakapan sebelumnya:
-${shortMemory || "Belum ada percakapan sebelumnya."}
+Konteks:
+${shortMemory || "Belum ada konteks."}
 
 Pesan pengguna:
 "${message}"
 
-Struktur jawaban:
-1. Validasi perasaan
-2. Respon empatik
-3. Pertanyaan lanjutan lembut
+Balas dengan:
+- Empati
+- Dukungan
+- Pertanyaan lembut
 `;
 
     const response = await fetch(
@@ -51,30 +50,30 @@ Struktur jawaban:
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          contents: [
-            {
-              role: "user",
-              parts: [{ text: prompt }],
-            },
-          ],
+          contents: [{ role: "user", parts: [{ text: prompt }] }],
         }),
-      }
+      },
     );
+
+    if (!response.ok) {
+      const err = await response.text();
+      console.error("Gemini API error:", err);
+      return res.status(200).json({
+        reply: "Aku masih di sini ya 🌱 Kamu boleh cerita pelan-pelan.",
+      });
+    }
 
     const data = await response.json();
 
-    if (!response.ok) {
-      console.error(data);
-      return res.status(500).json({ error: "Gemini API error" });
-    }
+    const reply =
+      data?.candidates?.[0]?.content?.parts?.[0]?.text ||
+      "Aku mendengarkanmu 🌱";
 
-    const text =
-      data.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "Aku di sini ya 🌱 Ceritakan pelan-pelan, aku mendengarkan.";
-
-    return res.status(200).json({ reply: text.trim() });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: "Internal server error" });
+    return res.status(200).json({ reply: reply.trim() });
+  } catch (err) {
+    console.error("Server error:", err);
+    return res.status(200).json({
+      reply: "Aku di sini, hanya perlu waktu sebentar ya 🌿",
+    });
   }
 }
