@@ -1,25 +1,20 @@
 import Navbar from "../components/Navbar";
 import React, { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, Sparkles, AlertCircle, Loader2 } from "lucide-react";
+import { Send, Bot, User, AlertCircle, Loader2 } from "lucide-react";
 
 function TanyaAI() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([
     {
       role: "ai",
-      text: "Halo! 👋 Saya asisten AI kesehatan mental. Saya di sini untuk mendengarkan dan membantu Anda. Ceritakan apa yang Anda rasakan hari ini?",
+      text: "Halo! 👋 Aku di sini untuk menemani kamu. Ceritakan apa yang kamu rasakan hari ini.",
     },
   ]);
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef(null);
-  const inputRef = useRef(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
 
   useEffect(() => {
-    scrollToBottom();
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const sendMessage = async () => {
@@ -27,7 +22,6 @@ function TanyaAI() {
 
     const userMessage = input;
 
-    // tampilkan pesan user
     setMessages((prev) => [...prev, { role: "user", text: userMessage }]);
     setInput("");
     setLoading(true);
@@ -38,34 +32,23 @@ function TanyaAI() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message: userMessage,
-          // 🔒 kirim history SUPER AMAN & konsisten
-          history: messages
-            .filter((m) => m.role === "user" || m.role === "assistant")
-            .slice(-2),
+          history: messages.filter((m) => m.role === "user" || m.role === "ai"),
         }),
       });
 
       const data = await res.json();
 
+      setMessages((prev) => [...prev, { role: "ai", text: data.reply }]);
+    } catch (err) {
       setMessages((prev) => [
         ...prev,
         {
           role: "ai",
-          text:
-            data.reply ||
-            "Aku tetap di sini 🌱 Kadang butuh satu napas sebelum lanjut.",
-        },
-      ]);
-    } catch (error) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "ai",
-          text: "Aku di sini ya 🌿 Kalau mau, kamu bisa lanjut cerita.",
+          text: "Aku masih di sini 🌿 Kalau mau, kamu bisa lanjut cerita.",
         },
       ]);
     } finally {
-      setLoading(false); // ✅ WAJIB
+      setLoading(false);
     }
   };
 
@@ -74,48 +57,6 @@ function TanyaAI() {
       e.preventDefault();
       sendMessage();
     }
-  };
-
-  const formatMessage = (text) => {
-    const lines = text.split("\n");
-    return lines.map((line, i) => {
-      // Bold text
-      if (line.match(/^\*\*(.*)\*\*$/)) {
-        return (
-          <p key={i} className="mt-3 mb-1 font-bold text-gray-800">
-            {line.replace(/\*\*/g, "")}
-          </p>
-        );
-      }
-      // Numbered list
-      if (line.match(/^\d+\./)) {
-        return (
-          <p key={i} className="my-1 ml-4 text-gray-700">
-            {line}
-          </p>
-        );
-      }
-      // Bullet or emoji start
-      if (line.match(/^(💡|⚠️|✨)/)) {
-        return (
-          <p
-            key={i}
-            className="p-3 my-2 text-gray-700 border-l-4 border-teal-400 rounded-lg bg-teal-50"
-          >
-            {line}
-          </p>
-        );
-      }
-      // Regular text
-      if (line.trim()) {
-        return (
-          <p key={i} className="my-2 leading-relaxed text-gray-700">
-            {line}
-          </p>
-        );
-      }
-      return <br key={i} />;
-    });
   };
 
   return (
