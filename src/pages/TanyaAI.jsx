@@ -65,111 +65,66 @@ function TanyaAI() {
       <div className="flex flex-col h-screen pt-16">
         <div className="flex-1 overflow-hidden">
           <div className="container h-full max-w-4xl px-4 py-6 mx-auto">
-            <div className="flex flex-col h-full bg-white border border-gray-200 shadow-xl rounded-2xl">
-              <div className="flex-1 p-4 space-y-4 overflow-y-auto md:p-6 scroll-smooth">
+            <div className="flex flex-col h-full bg-white border shadow rounded-2xl">
+              <div className="flex-1 p-4 space-y-4 overflow-y-auto">
                 {messages.map((msg, i) => (
                   <div
                     key={i}
                     className={`flex gap-3 ${
                       msg.role === "user" ? "justify-end" : "justify-start"
-                    } animate-fadeIn`}
+                    }`}
                   >
-                    {/* AI Avatar */}
                     {msg.role === "ai" && (
-                      <div className="flex-shrink-0">
-                        <div className="flex items-center justify-center w-10 h-10 rounded-full shadow-md bg-gradient-to-br from-teal-500 to-blue-600">
-                          <Bot className="w-5 h-5 text-white" />
-                        </div>
-                      </div>
+                      <Bot className="w-6 h-6 text-teal-600" />
                     )}
-
-                    {/* Message Bubble */}
                     <div
-                      className={`max-w-[85%] md:max-w-[75%] rounded-2xl px-4 py-3 ${
+                      className={`px-4 py-3 rounded-xl max-w-[75%] ${
                         msg.role === "user"
-                          ? "bg-gradient-to-br from-teal-500 to-teal-600 text-white shadow-lg"
-                          : "bg-gray-50 border border-gray-200 shadow-sm"
+                          ? "bg-teal-500 text-white"
+                          : "bg-gray-100"
                       }`}
                     >
-                      {msg.role === "user" ? (
-                        <p className="leading-relaxed text-white">{msg.text}</p>
-                      ) : (
-                        <div className="text-sm">{formatMessage(msg.text)}</div>
-                      )}
+                      {msg.text}
                     </div>
-
-                    {/* User Avatar */}
                     {msg.role === "user" && (
-                      <div className="flex-shrink-0">
-                        <div className="flex items-center justify-center w-10 h-10 rounded-full shadow-md bg-gradient-to-br from-blue-500 to-purple-600">
-                          <User className="w-5 h-5 text-white" />
-                        </div>
-                      </div>
+                      <User className="w-6 h-6 text-blue-600" />
                     )}
                   </div>
                 ))}
 
-                {/* Loading Indicator */}
                 {loading && (
-                  <div className="flex justify-start gap-3 animate-fadeIn">
-                    <div className="flex items-center justify-center w-10 h-10 rounded-full shadow-md bg-gradient-to-br from-teal-500 to-blue-600">
-                      <Bot className="w-5 h-5 text-white" />
-                    </div>
-                    <div className="px-4 py-3 border border-gray-200 shadow-sm bg-gray-50 rounded-2xl">
-                      <div className="flex items-center gap-2 text-gray-500">
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        <span className="text-sm">AI sedang mengetik...</span>
-                      </div>
-                    </div>
+                  <div className="flex items-center gap-2 text-gray-500">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    AI sedang mengetik...
                   </div>
                 )}
 
                 <div ref={messagesEndRef} />
               </div>
 
-              {/* Input Area */}
-              <div className="p-4 border-t border-gray-200 bg-gray-50">
-                <div className="flex items-end gap-3">
-                  <div className="flex-1">
-                    <textarea
-                      ref={inputRef}
-                      value={input}
-                      onChange={(e) => setInput(e.target.value)}
-                      onKeyPress={handleKeyPress}
-                      className="w-full px-4 py-3 transition-all duration-300 bg-white border-2 border-gray-200 resize-none rounded-xl focus:outline-none focus:border-teal-500"
-                      placeholder="Ceritakan perasaanmu hari ini..."
-                      rows="2"
-                      disabled={loading}
-                    />
-                  </div>
+              <div className="p-4 border-t bg-gray-50">
+                <div className="flex gap-2">
+                  <textarea
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    className="flex-1 p-3 border rounded-lg resize-none"
+                    placeholder="Ceritakan perasaanmu..."
+                    rows={2}
+                    disabled={loading}
+                  />
                   <button
                     onClick={sendMessage}
                     disabled={loading || !input.trim()}
-                    className={`p-4 rounded-xl font-semibold transition-all duration-300 flex items-center gap-2 ${
-                      loading || !input.trim()
-                        ? "bg-gray-300 cursor-not-allowed"
-                        : "bg-gradient-to-br from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 shadow-lg hover:shadow-xl hover:scale-105"
-                    }`}
+                    className="p-3 text-white bg-teal-500 rounded-lg"
                   >
-                    <Send
-                      className={`w-5 h-5 ${
-                        loading || !input.trim()
-                          ? "text-gray-500"
-                          : "text-white"
-                      }`}
-                    />
+                    <Send />
                   </button>
                 </div>
 
-                {/* Disclaimer */}
-                <div className="flex items-start gap-2 p-3 mt-3 text-xs text-gray-500 border rounded-lg bg-amber-50 border-amber-200">
-                  <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-                  <p>
-                    <strong className="text-amber-700">Penting:</strong> AI ini
-                    adalah alat bantu dan bukan pengganti konsultasi profesional
-                    kesehatan mental. Jika Anda mengalami krisis, segera hubungi
-                    profesional atau layanan darurat.
-                  </p>
+                <div className="flex gap-2 mt-3 text-xs text-amber-700">
+                  <AlertCircle className="w-4 h-4" />
+                  AI ini bukan pengganti profesional kesehatan mental.
                 </div>
               </div>
             </div>
