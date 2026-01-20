@@ -21,13 +21,6 @@ function Footer() {
     type: "success", // success | error
     message: "",
   });
-  console.log(
-    import.meta.env.VITE_EMAILJS_SERVICE_ID,
-    import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-    import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
-  );
-
-  console.log("HANDLE SEND EMAIL TERPANGGIL", form);
 
   const handleSendEmail = () => {
     if (!form.name || !form.email || !form.message) return;
