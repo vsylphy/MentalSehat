@@ -22,15 +22,19 @@ function Footer() {
     message: "",
   });
 
+  console.log("HANDLE SEND EMAIL TERPANGGIL", form);
+
   const handleSendEmail = () => {
     if (!form.name || !form.email || !form.message) return;
 
     const handleSendEmail = async () => {
+      console.log("HANDLE SEND EMAIL TERPANGGIL", form);
+
       if (!form.name || !form.email || !form.message) {
         setAlert({
           show: true,
           type: "error",
-          message: "Mohon lengkapi semua data sebelum mengirim 🙏",
+          message: "Mohon lengkapi semua data 🙏",
         });
         return;
       }
@@ -50,7 +54,7 @@ function Footer() {
         setAlert({
           show: true,
           type: "success",
-          message: "Pesan berhasil dikirim 💌 Terima kasih!",
+          message: "Pesan berhasil dikirim 💌",
         });
 
         setForm({ name: "", email: "", message: "" });
@@ -59,13 +63,13 @@ function Footer() {
           setShowEmailModal(false);
           setAlert({ show: false, type: "success", message: "" });
         }, 2000);
-      } catch (error) {
-        console.error("EmailJS error:", error);
+      } catch (err) {
+        console.error("EmailJS ERROR:", err);
 
         setAlert({
           show: true,
           type: "error",
-          message: "Gagal mengirim pesan. Silakan coba lagi 🙏",
+          message: "Gagal mengirim pesan 😥",
         });
       }
     };
