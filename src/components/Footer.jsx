@@ -22,58 +22,36 @@ function Footer() {
     message: "",
   });
 
-  const handleSendEmail = () => {
-    if (!form.name || !form.email || !form.message) return;
+  const handleSendEmail = async () => {
+    if (!form.name || !form.email || !form.message) {
+      alert("⚠️ Semua field wajib diisi");
+      return;
+    }
 
-    const handleSendEmail = async () => {
-      console.log("HANDLE SEND EMAIL TERPANGGIL", form);
+    try {
+      console.log("MENGIRIM EMAIL:", form);
 
-      if (!form.name || !form.email || !form.message) {
-        setAlert({
-          show: true,
-          type: "error",
-          message: "Mohon lengkapi semua data 🙏",
-        });
-        return;
-      }
+      const result = await emailjs.send(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+        {
+          name: form.name,
+          email: form.email,
+          message: form.message,
+        },
+        import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
+      );
 
-      try {
-        await emailjs.send(
-          import.meta.env.VITE_EMAILJS_SERVICE_ID,
-          import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-          {
-            name: form.name,
-            email: form.email,
-            message: form.message,
-          },
-          import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
-        );
+      console.log("EMAIL TERKIRIM:", result);
 
-        setAlert({
-          show: true,
-          type: "success",
-          message: "Pesan berhasil dikirim 💌",
-        });
+      alert("✅ Pesan berhasil dikirim. Terima kasih 💌");
 
-        setForm({ name: "", email: "", message: "" });
-
-        setTimeout(() => {
-          setShowEmailModal(false);
-          setAlert({ show: false, type: "success", message: "" });
-        }, 2000);
-      } catch (err) {
-        console.error("EmailJS ERROR:", err);
-
-        setAlert({
-          show: true,
-          type: "error",
-          message: "Gagal mengirim pesan 😥",
-        });
-      }
-    };
-
-    setShowEmailModal(false);
-    setForm({ name: "", email: "", message: "" });
+      setShowEmailModal(false);
+      setForm({ name: "", email: "", message: "" });
+    } catch (error) {
+      console.error("EMAILJS ERROR:", error);
+      alert("❌ Gagal mengirim pesan. Silakan coba lagi.");
+    }
   };
 
   const socialLinks = [
