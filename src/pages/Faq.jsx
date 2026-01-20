@@ -58,35 +58,37 @@ function Faq() {
       name: "Mohammad Rafi al-Qinthara",
       role: "Mental Health Observer • Main Educator",
       image: "/images/3.jpeg",
-      linkedin: "",
+      linkedin:
+        "https://www.linkedin.com/in/mohammad-rafi-al-qinthara-9a2689399/",
       highlight: true,
     },
     {
       name: "Miqdad Azzam Fawazy",
       role: "Observation Support • Insight Contributor",
       image: "/images/4.jpeg",
-      linkedin: "",
+      linkedin: "https://www.linkedin.com/in/miqdad-azzam-fawazy-199830393/ ",
       highlight: true,
     },
     {
       name: "Yasfa Yulianti Nazia",
       role: "Visual Identity • Social Media & Reporting",
       image: "/images/5.jpeg",
-      linkedin: "",
+      linkedin: "https://www.linkedin.com/in/yasfa-yulianti/",
       highlight: true,
     },
     {
       name: "Khaeyla Arsya Wijaya",
       role: "Videography • Editing & Field Support",
       image: "/images/6.jpeg",
-      linkedin: "",
+      linkedin: "https://www.linkedin.com/in/khaeyla-arsya-44918a39b/",
       highlight: true,
     },
     {
       name: "Muhammad Fauzan Firmansyah",
       role: "Interactive Animation • Motion Design",
       image: "/images/7.jpeg",
-      linkedin: "",
+      linkedin:
+        "https://www.linkedin.com/in/muhammad-fauzan-firmansyah-a26458394/",
       highlight: true,
     },
   ];

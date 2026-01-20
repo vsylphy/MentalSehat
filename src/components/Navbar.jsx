@@ -80,7 +80,7 @@ function Navbar() {
                 MentalSehat
               </div>
               <div className="-ml-5 text-xs text-gray-500">
-                Platform Kesehatan Mental
+                Mental Sehat, Digital Balance
               </div>
             </div>
           </a>

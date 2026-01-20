@@ -103,7 +103,7 @@ function Footer() {
     },
     {
       icon: <Linkedin className="w-5 h-5" />,
-      url: "#",
+      url: "https://www.linkedin.com/in/radhi-nur-rubiansyah-404298318/",
       label: "LinkedIn",
       color: "hover:text-blue-700",
     },
@@ -134,7 +134,7 @@ function Footer() {
                     MentalSehat
                   </div>
                   <div className="-ml-6 text-gray-600 text-m">
-                    Platform Kesehatan Mental
+                    Mental Sehat, Digital Balance
                   </div>
                 </div>
               </div>
