@@ -256,6 +256,7 @@ function Footer() {
                 Batal
               </button>
               <button
+                type="button"
                 onClick={handleSendEmail}
                 className="px-5 py-2 font-semibold text-white transition rounded-xl bg-gradient-to-br from-teal-500 to-blue-600 hover:scale-105"
               >
