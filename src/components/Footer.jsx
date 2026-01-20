@@ -10,13 +10,15 @@ function Footer() {
   };
 
   const [showEmailModal, setShowEmailModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const [form, setForm] = useState({
     name: "",
     email: "",
     message: "",
   });
 
-  const [alert, setAlert] = useState({
+  const [alertState, setAlertState] = useState({
     show: false,
     type: "success", // success | error
     message: "",
@@ -24,11 +26,17 @@ function Footer() {
 
   const handleSendEmail = async () => {
     if (!form.name || !form.email || !form.message) {
-      alert("⚠️ Semua field wajib diisi");
+      setAlertState({
+        show: true,
+        type: "error",
+        message: "⚠️ Semua field wajib diisi",
+      });
       return;
     }
 
     try {
+      setLoading(true);
+
       console.log("MENGIRIM EMAIL:", form);
 
       const result = await emailjs.send(
@@ -44,13 +52,28 @@ function Footer() {
 
       console.log("EMAIL TERKIRIM:", result);
 
-      alert("✅ Pesan berhasil dikirim. Terima kasih 💌");
+      setAlertState({
+        show: true,
+        type: "success",
+        message: "✅ Pesan berhasil dikirim. Terima kasih 💙",
+      });
 
-      setShowEmailModal(false);
-      setForm({ name: "", email: "", message: "" });
+      // auto close modal
+      setTimeout(() => {
+        setShowEmailModal(false);
+        setForm({ name: "", email: "", message: "" });
+        setAlertState({ show: false, type: "success", message: "" });
+      }, 2000);
     } catch (error) {
       console.error("EMAILJS ERROR:", error);
-      alert("❌ Gagal mengirim pesan. Silakan coba lagi.");
+
+      setAlertState({
+        show: true,
+        type: "error",
+        message: "❌ Gagal mengirim pesan. Silakan coba lagi.",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -186,29 +209,34 @@ function Footer() {
 
       {showEmailModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="w-full max-w-md p-6 bg-white shadow-xl rounded-2xl">
-            <h2 className="mb-4 text-xl font-bold text-teal-600">
+          <div className="w-full max-w-md p-6 bg-white shadow-2xl rounded-3xl animate-scaleIn">
+            <h2 className="mb-2 text-2xl font-bold text-transparent bg-gradient-to-r from-teal-500 to-blue-600 bg-clip-text">
               Kirim Pesan 📩
             </h2>
-            {alert.show && (
+            <p className="mb-4 text-sm text-gray-500">
+              Kami akan merespon secepat mungkin
+            </p>
+
+            {alertState.show && (
               <div
-                className={`mb-4 rounded-xl px-4 py-3 text-sm font-medium
-    ${
-      alert.type === "success"
-        ? "bg-green-100 text-green-700 border border-green-300"
-        : "bg-red-100 text-red-700 border border-red-300"
-    }`}
+                className={`mb-4 rounded-xl px-4 py-3 text-sm font-semibold transition-all
+          ${
+            alertState.type === "success"
+              ? "bg-green-100 text-green-700 border border-green-300"
+              : "bg-red-100 text-red-700 border border-red-300"
+          }`}
               >
-                {alert.message}
+                {alertState.message}
               </div>
             )}
+
             <div className="space-y-3">
               <input
                 type="text"
                 placeholder="Nama"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:border-teal-500"
+                className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-400"
               />
 
               <input
@@ -216,7 +244,7 @@ function Footer() {
                 placeholder="Email kamu"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
-                className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:border-teal-500"
+                className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-400"
               />
 
               <textarea
@@ -224,23 +252,25 @@ function Footer() {
                 placeholder="Pesan yang ingin disampaikan..."
                 value={form.message}
                 onChange={(e) => setForm({ ...form, message: e.target.value })}
-                className="w-full px-4 py-3 border resize-none rounded-xl focus:outline-none focus:border-teal-500"
+                className="w-full px-4 py-3 border resize-none rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-400"
               />
             </div>
 
             <div className="flex justify-end gap-3 mt-6">
               <button
                 onClick={() => setShowEmailModal(false)}
-                className="text-gray-600 hover:text-gray-800"
+                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                disabled={loading}
               >
                 Batal
               </button>
+
               <button
-                type="button"
                 onClick={handleSendEmail}
-                className="px-5 py-2 font-semibold text-white transition rounded-xl bg-gradient-to-br from-teal-500 to-blue-600 hover:scale-105"
+                disabled={loading}
+                className="px-6 py-2 font-semibold text-white transition-all rounded-xl bg-gradient-to-br from-teal-500 to-blue-600 hover:scale-105 disabled:opacity-60"
               >
-                Kirim
+                {loading ? "Mengirim..." : "Kirim"}
               </button>
             </div>
           </div>
