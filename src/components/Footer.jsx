@@ -16,11 +16,24 @@ function Footer() {
     message: "",
   });
 
+  const [alert, setAlert] = useState({
+    show: false,
+    type: "success", // success | error
+    message: "",
+  });
+
   const handleSendEmail = () => {
     if (!form.name || !form.email || !form.message) return;
 
     const handleSendEmail = async () => {
-      if (!form.name || !form.email || !form.message) return;
+      if (!form.name || !form.email || !form.message) {
+        setAlert({
+          show: true,
+          type: "error",
+          message: "Mohon lengkapi semua data sebelum mengirim 🙏",
+        });
+        return;
+      }
 
       try {
         await emailjs.send(
@@ -31,16 +44,29 @@ function Footer() {
             email: form.email,
             message: form.message,
           },
-          import.meta.env.EMAILJS_PUBLIC_KEY,
+          import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
         );
 
-        alert("Pesan berhasil dikirim 💌 Terima kasih sudah menghubungi kami.");
+        setAlert({
+          show: true,
+          type: "success",
+          message: "Pesan berhasil dikirim 💌 Terima kasih!",
+        });
 
-        setShowEmailModal(false);
         setForm({ name: "", email: "", message: "" });
+
+        setTimeout(() => {
+          setShowEmailModal(false);
+          setAlert({ show: false, type: "success", message: "" });
+        }, 2000);
       } catch (error) {
         console.error("EmailJS error:", error);
-        alert("Gagal mengirim pesan. Coba lagi ya 🙏");
+
+        setAlert({
+          show: true,
+          type: "error",
+          message: "Gagal mengirim pesan. Silakan coba lagi 🙏",
+        });
       }
     };
 
@@ -184,7 +210,18 @@ function Footer() {
             <h2 className="mb-4 text-xl font-bold text-teal-600">
               Kirim Pesan 📩
             </h2>
-
+            {alert.show && (
+              <div
+                className={`mb-4 rounded-xl px-4 py-3 text-sm font-medium
+    ${
+      alert.type === "success"
+        ? "bg-green-100 text-green-700 border border-green-300"
+        : "bg-red-100 text-red-700 border border-red-300"
+    }`}
+              >
+                {alert.message}
+              </div>
+            )}
             <div className="space-y-3">
               <input
                 type="text"
