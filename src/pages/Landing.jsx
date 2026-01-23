@@ -271,13 +271,13 @@ function LandingPage() {
     },
     {
       id: 3,
-      type: "video",
-      src: "/videos/Video 2.mp4",
+      type: "image",
+      src: "",
     },
     {
       id: 4,
-      type: "image",
-      src: "/images/banners/banner-2.jpg",
+      type: "video",
+      src: "/videos/Video 2.mp4",
     },
     {
       id: 5,
