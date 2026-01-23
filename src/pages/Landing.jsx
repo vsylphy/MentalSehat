@@ -1,7 +1,7 @@
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Heart,
   Brain,
@@ -15,6 +15,8 @@ import {
   ExternalLink,
   Quote,
   BookOpen,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 
 function LandingPage() {
@@ -24,6 +26,12 @@ function LandingPage() {
 
   const [videos, setVideos] = useState([]);
   const [loadingVideos, setLoadingVideos] = useState(true);
+
+  const [activeAd, setActiveAd] = useState(0);
+  const [showAds, setShowAds] = useState(() => {
+    return localStorage.getItem("showads") !== "false";
+  });
+  const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -204,7 +212,7 @@ function LandingPage() {
           const videoId = getYoutubeId(v.url);
 
           const res = await fetch(
-            `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=${videoId}&key=${API_KEY}`
+            `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=${videoId}&key=${API_KEY}`,
           );
 
           const data = await res.json();
@@ -222,7 +230,7 @@ function LandingPage() {
               item.snippet.thumbnails.high.url,
             duration: formatDuration(item.contentDetails.duration),
           };
-        })
+        }),
       );
 
       setVideos(results.filter(Boolean));
@@ -244,16 +252,159 @@ function LandingPage() {
 
   const paginatedVideos = filteredVideos.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
+    currentPage * ITEMS_PER_PAGE,
   );
   useEffect(() => {
     setCurrentPage(1);
   }, [activeCategory]);
 
+  const ads = [
+    {
+      id: 1,
+      type: "video",
+      src: "/videos/Video.mp4",
+    },
+    {
+      id: 2,
+      type: "video",
+      src: "/videos/Video 1.mp4",
+    },
+    {
+      id: 3,
+      type: "video",
+      src: "/videos/Video 2.mp4",
+    },
+    {
+      id: 4,
+      type: "image",
+      src: "/images/banners/banner-2.jpg",
+    },
+    {
+      id: 5,
+      type: "image",
+      src: "",
+    },
+  ];
+
+  const AUTO_SLIDE_DELAY = 15000;
+  useEffect(() => {
+    if (!showAds || isPaused) return;
+
+    const interval = setInterval(() => {
+      setActiveAd((prev) => (prev + 1) % ads.length);
+    }, AUTO_SLIDE_DELAY);
+
+    return () => clearInterval(interval);
+  }, [showAds, isPaused]);
+
+  const touchStartX = useRef(0);
+
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+    setIsPaused(true);
+  };
+
+  const handleTouchEnd = (e) => {
+    const endX = e.changedTouches[0].clientX;
+
+    if (touchStartX.current - endX > 50) {
+      setActiveAd((prev) => (prev + 1) % ads.length);
+    }
+
+    if (endX - touchStartX.current > 50) {
+      setActiveAd((prev) => (prev - 1 + ads.length) % ads.length);
+    }
+
+    setIsPaused(false);
+  };
+
   return (
     <>
       <Navbar />
-      <div className="min-h-screen pt-16 bg-white">
+      <div className="">
+        {/* ===== PROMO BANNER ===== */}
+        <section className="relative overflow-hidden bg-gradient-to-br from-white via-teal-50 to-white">
+          <div className="container px-6 pt-20 pb-10 mx-auto mt-8">
+            {/* BANNER */}
+            <div
+              onMouseEnter={() => setIsPaused(true)}
+              onMouseLeave={() => setIsPaused(false)}
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+              className={
+                "relative overflow-hidden transition-all duration-700 ease-in-out shadow-xl rounded-2xl " +
+                (showAds
+                  ? "opacity-100 scale-100 max-h-[500px]"
+                  : "opacity-0 scale-95 max-h-0")
+              }
+            >
+              <div className="relative w-full aspect-[16/9] max-h-[600px] md:max-h-[680px]">
+                <div
+                  key={activeAd}
+                  className="absolute inset-0 transition-all duration-700 ease-in-out animate-fadeIn"
+                >
+                  {ads[activeAd].type === "video" ? (
+                    <video
+                      src={ads[activeAd].src}
+                      autoPlay
+                      muted
+                      loop
+                      onPlay={() => setIsPaused(true)}
+                      onPause={() => setIsPaused(false)}
+                      className="object-contain w-full h-full bg-transparent "
+                    />
+                  ) : (
+                    <img
+                      src={ads[activeAd].src}
+                      alt="Promo Banner"
+                      className="object-contain w-full h-full bg-transparent "
+                    />
+                  )}
+
+                  {/* soft overlay biar nyatu ke hero */}
+                  <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/20 via-transparent to-transparent" />
+                </div>
+              </div>
+              {/* NAV DOT */}
+              <div className="absolute z-20 flex gap-2 -translate-x-1/2 bottom-4 left-1/2">
+                {ads.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActiveAd(i)}
+                    className={`transition-all duration-300 rounded-full ${
+                      activeAd === i
+                        ? "w-8 h-2 bg-white"
+                        : "w-2 h-2 bg-white/60 hover:bg-white"
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* TOGGLE BUTTON */}
+            <div className="flex justify-center mt-6">
+              <button
+                onClick={() => setShowAds(!showAds)}
+                className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-teal-700 transition-all duration-300 bg-white border border-teal-200 rounded-full shadow-sm hover:shadow-md hover:bg-teal-50 hover:border-teal-300 group"
+              >
+                {showAds ? (
+                  <>
+                    <ChevronUp className="w-4 h-4 transition-transform duration-300 group-hover:-translate-y-0.5" />
+                    <span>Sembunyikan Banner</span>
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="w-4 h-4 transition-transform duration-300 group-hover:translate-y-0.5" />
+                    <span>Tampilkan Banner</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div className="min-h-screen">
         {/* Hero Section */}
         <section className="relative pt-20 pb-32 overflow-hidden bg-gradient-to-br from-teal-50 via-white to-blue-50">
           <div
@@ -305,13 +456,24 @@ function LandingPage() {
               </p>
 
               <div className="flex flex-col justify-center gap-4 mb-12 sm:flex-row">
-                <button className="px-8 py-4 text-lg font-semibold text-white transition-all duration-300 shadow-lg group bg-gradient-to-r from-teal-500 to-teal-600 rounded-xl hover:from-teal-600 hover:to-teal-700 hover:shadow-xl hover:scale-105">
+                <button
+                  onClick={() => (window.location.href = "/tanya-ai")}
+                  className="px-8 py-4 text-lg font-semibold text-white transition-all duration-300 shadow-lg group bg-gradient-to-r from-teal-500 to-teal-600 rounded-xl hover:from-teal-600 hover:to-teal-700 hover:shadow-xl hover:scale-105"
+                >
                   Mulai Sekarang - Gratis
                   <span className="inline-block ml-2 transition-transform group-hover:translate-x-1">
                     →
                   </span>
                 </button>
-                <button className="px-8 py-4 text-lg font-semibold text-teal-600 transition-all duration-300 bg-white border-2 border-teal-200 rounded-xl hover:border-teal-400 hover:shadow-lg">
+                <button
+                  onClick={() =>
+                    window.open(
+                      "/pdf/Laporan Litdig Kel. 1 - Kampanye Kesehatan Mental di Era Digital - TIF RP 25E.pdf",
+                      "blank",
+                    )
+                  }
+                  className="px-8 py-4 text-lg font-semibold text-teal-600 transition-all duration-300 bg-white border-2 border-teal-200 rounded-xl hover:border-teal-400 hover:shadow-lg"
+                >
                   Pelajari Lebih Lanjut
                 </button>
               </div>

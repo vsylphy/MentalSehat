@@ -234,9 +234,6 @@ export default function Moodku() {
     );
   }
 
-  /* =======================
-     QUIZ
-  ======================= */
   return (
     <>
       <Navbar />
