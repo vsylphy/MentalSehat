@@ -262,7 +262,7 @@ function LandingPage() {
     {
       id: 1,
       type: "video",
-      src: "/videos/Video.mp4",
+      src: "/videos/Litdug.mp4",
     },
     {
       id: 2,
