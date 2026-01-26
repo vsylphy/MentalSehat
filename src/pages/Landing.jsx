@@ -266,23 +266,23 @@ function LandingPage() {
     },
     {
       id: 2,
-      type: "video",
-      src: "/videos/Video 1.mp4",
+      type: "iamge",
+      src: "/images/banners/Banner 1.png",
     },
     {
       id: 3,
       type: "video",
-      src: "/videos/Video 2.mp4",
+      src: "/videos/Video 1.mp4",
     },
     {
       id: 4,
       type: "image",
-      src: "/images/banners/banner-2.jpg",
+      src: "/images/Banners/Banner 2.png",
     },
     {
       id: 5,
-      type: "image",
-      src: "",
+      type: "video",
+      src: "/videos/Video 2.mp4",
     },
   ];
 
