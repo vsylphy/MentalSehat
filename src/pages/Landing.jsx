@@ -277,7 +277,7 @@ function LandingPage() {
     {
       id: 4,
       type: "image",
-      src: "/images/Banners/Banner 2.png",
+      src: "/images/banners/Banner 2.png",
     },
     {
       id: 5,
